@@ -67,8 +67,8 @@ If the model ckpt base file name contains feat_x $x \in [3, 12, 24]$, pass
 - [x] Test Code
 - [ ] Demo Code
 - [ ] Datasets
-  - [ ] Residential
-  - [ ] Replica
+  - [x] Residential
+  - [x] Replica
   - [ ] Coffee Area
 - [ ] Reflectance Modelling
 - [ ] S-NeRF Baseline
