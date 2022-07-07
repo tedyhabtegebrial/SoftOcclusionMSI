@@ -80,15 +80,17 @@ class Utils(object):
             rad = coordinate_split[2]
         else:
             rad = torch.ones_like(theta).to(theta.device)
-        if self.dataset in ['replica', 'd3dkit', 'coffee', 'coffee_1d', 'coffee_2d', 'coffee_12v', 'coffee_r2', 'coffee_r3', 'coffee_r1', 'coffee3x3', 'dense_replica']:
-            x_locs = rad * torch.sin(phi) * torch.cos(theta)
-            y_locs = rad * torch.sin(phi) * torch.sin(theta)
-            z_locs = rad * torch.cos(phi)
-        elif self.dataset == 'residential':
+        if self.dataset == 'residential':
             # theta
             x_locs = rad * torch.cos(theta) * torch.cos(phi)
             z_locs = rad * torch.sin(theta) * torch.cos(phi)
             y_locs = rad * torch.sin(phi)
+        else:
+            # self.dataset in ['replica', 'd3dkit', 'coffee', 'coffee_1d', 'coffee_2d', 'coffee_12v', 'coffee_r2', 'coffee_r3', 'coffee_r1', 'coffee3x3', 'dense_replica']:
+            x_locs = rad * torch.sin(phi) * torch.cos(theta)
+            y_locs = rad * torch.sin(phi) * torch.sin(theta)
+            z_locs = rad * torch.cos(phi)
+
         xyz_locs = torch.cat([x_locs, y_locs, z_locs], dim=-1)
         return xyz_locs
 
