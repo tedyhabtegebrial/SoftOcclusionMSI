@@ -30,13 +30,13 @@ argparser.add_argument('--height', type=int, default=256)
 argparser.add_argument('--width', type=int, default=512)
 
 # Network related settings
-argparser.add_argument('--num_spheres', default=32, type=int, help='number of spheres to represent the scene')
+argparser.add_argument('--num_spheres', default=64, type=int, help='number of spheres to represent the scene')
 argparser.add_argument('--far', default=40, type=float,
                        help='near sphere radius | 40 for replica')
 argparser.add_argument('--near', default=0.6, type=float, help='far sphere radius| .6 for replica')
 argparser.add_argument('--num_layers', default=3, type=int, help='number occlusion layers')
 argparser.add_argument('--feats_per_layer', default=3, type=int, help='number features per layer in the scene appearance')
-argparser.add_argument('--lambda_mse', type=float, default=0.2,
+argparser.add_argument('--lambda_mse', type=float, default=1,
                        help='weight mse reconstruction loss')
 
 # Positional Encoding details
