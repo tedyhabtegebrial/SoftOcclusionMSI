@@ -1,6 +1,7 @@
 __all__ = ['get_dataset']
 from .med_port import MedPortLoader
-# from .ricoh_loader import RicohLoader
+from .residential import ResidentialAreaLoader
+from .replica import ReplicaLoader
 # from .dense_replica_loader import DenseReplicaLoader
 # from .coffe_area_loader import CoffeAreaLoader
 # from .coffee_area_1d import CoffeArea1DLoader
@@ -13,14 +14,14 @@ from .med_port import MedPortLoader
 def get_dataset(configs):
     dataset_map = {}
     dataset_map['d3dkit'] = MedPortLoader
-    # dataset_map['ricoh'] = RicohLoader
+    dataset_map['residential'] = ResidentialAreaLoader
+    dataset_map['replica'] = ReplicaLoader
     # dataset_map['coffee_1d'] = CoffeArea1DLoader
     # dataset_map['coffee_2d'] = CoffeArea2DLoader
     # dataset_map['coffee_12v'] = CoffeArea12VLoader
     # dataset_map['coffee_r3'] = CoffeAreaR3Loader
     # dataset_map['coffee_r2'] = CoffeAreaR2Loader
     # dataset_map['coffee_r1'] = CoffeAreaR1Loader
-    # dataset_map['replica'] = DenseReplicaLoader
     # dataset_map['coffee'] = CoffeAreaLoader
     assert  configs.dataset in dataset_map.keys(), f'dataset mapping for {configs.dataset} not implemented'
     return dataset_map[configs.dataset](configs)

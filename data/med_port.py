@@ -3,9 +3,7 @@ import torch
 import cv2 as cv
 import numpy as np
 import torch.nn.functional as F
-
-from pathlib import Path
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 
 class MedPortLoader(Dataset):
     def __init__(self, configs):
@@ -44,9 +42,11 @@ class MedPortLoader(Dataset):
             idxs = [6, 8, 16, 18, 5, 9, 15, 19]
             files = [os.path.join(
                 folder, f'{str(i).zfill(8)}.jpg') for i in idxs]
+        self.baseline = 0.2
         self.poses = self._get_pose(idxs, ref_idx)
         self.imgs = self._read_imgs(files)
         self.ref_rgb = self._read_imgs([ref_img])
+
 
     def _get_pose(self, idx_list, ref_idx):
         pose_list = []
@@ -54,7 +54,8 @@ class MedPortLoader(Dataset):
         r_mat = torch.eye(3)
         for idx in idx_list:
             h_idx, w_idx = idx//5, idx%5
-            pose = torch.FloatTensor([0, 0.2*(w_ref - w_idx), 0.2*(h_ref - h_idx)]).view(3, 1)
+            pose = torch.FloatTensor(
+                [0, self.baseline*(w_ref - w_idx), self.baseline*(h_ref - h_idx)]).view(3, 1)
             pose = torch.cat([r_mat, pose], dim=1)
             pose_list.append(pose)
         pose_list = torch.stack(pose_list)
