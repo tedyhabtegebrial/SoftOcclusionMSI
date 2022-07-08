@@ -1,5 +1,5 @@
 <h1 align=left> Datasets </h1>
-<h2 align=left> Medieval Port Dataset </h2>
+<h1 align=left> Medieval Port Dataset </h2>
 <h3 align=left> Camera Arrangement </h3>
 This dataset consists of a light-field with 25 sub-aperture images, arranged as shown below. The color coding indicates the training/test/val split.
 
@@ -14,7 +14,7 @@ This dataset consists of a light-field with 25 sub-aperture images, arranged as 
   </div>
 </div>
 
-<h2 align=left> Residential Area Dataset </h2>
+<h1 align=left> Residential Area Dataset </h2>
 <h3 align=left> Camera Arrangement </h3>
 This dataset has 3 scenes, each with 3x3 light-field images. 
 
@@ -34,7 +34,7 @@ Check the [residential data loader](/data/residential.py) and [utils](/src/utils
 8 of the 9 views are used for training and 1 view is held out for testing.
 
 
-<h2 align=left> Replica Dataset </h2>
+<h1 align=left> Replica Dataset </h2>
 <h3 align=left> Camera Arrangement </h3>
 This dataset has 14 scenes, each with 9x9 light-field images. 
 
@@ -58,13 +58,3 @@ testing = [4, 20, 22, 24, 36, 38, 42, 44, 56, 58, 60, 76]
 trainining = [0, 2, 6, 8, 18, 26, 40, 54, 62, 72, 74, 80]
 validation = [1, 5, 7, 37, 41, 43, 71, 77, 79]
 ```
-
-
-
-
-
-
-
-
-
-
