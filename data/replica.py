@@ -1,25 +1,11 @@
 import os
-import torch
-import numpy as np
 
-from torch.utils.data import Dataset, DataLoader
-
-import os
-import tqdm
-import torch
-import json
-from PIL import Image
 import numpy as np
-from itertools import islice
-import random
-import torch.nn.functional as F
-import copy
 import cv2 as cv
 
-# random.seed(1234)
-# np.random.seed(1234)
-# torch.random.manual_seed(1234)
-
+import torch
+from torch.utils.data import Dataset
+import torch.nn.functional as F
 
 class ReplicaLoader(Dataset):
     def __init__(self, configs):
@@ -51,7 +37,7 @@ class ReplicaLoader(Dataset):
         for h in range(0, 9):
             for w in range(0, 9):
                 fname = os.path.join(
-                    base_name, f'example_{str(scene_number).zfill(10)}.color_{h}_{w}.png')
+                    base_name, f'image_{h}_{w}.png')
                 files.append(fname)
         # train_idxs = [0, 1, 3, 4, 5, 9, 12, 15, 19, 20, 21, 24]
         train_idxs = [0, 2, 6, 8, 18, 26, 40, 54, 62, 72, 74, 80]
