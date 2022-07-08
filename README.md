@@ -61,6 +61,9 @@ If the model ckpt base file name contains feat_x $x \in [3, 12, 24]$, pass
 --feats_per_layer=x # x in [3,12,24]
 ```
 
+### Scene Number
+```Replica``` and ```Residential Area``` datasets have, 14 and 3 scenes, respectively. During training and testing pass the corect ``scene_number`` parameter. ```scene_number``` ranges from ```0-13`` for Replica and ```0-2``` for Residential Area datasets.
+
 
 ### Missing Features
 
