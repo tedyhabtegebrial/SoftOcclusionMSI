@@ -1,3 +1,4 @@
+from audioop import reverse
 import math
 import torch
 import torch.nn as nn
@@ -16,6 +17,9 @@ def get_output_size(configs):
 def get_positional_encoding(l_num, configs):
     scale = 2**(configs.num_blocks - l_num - 1)
     h, w = configs.height//scale, configs.width//scale
+    # print(configs.height, configs.width, scale)
+    # print(h, w)
+    # exit()
     phi = torch.linspace(0, math.pi, h).view(1, 1, h, 1)
     phi = phi.expand(1,1,h,w)
     theta = torch.linspace(2*math.pi, 0, w).view(1, 1, 1, w)
@@ -68,7 +72,7 @@ class DecodeFeatures(nn.Module):
 
 
 class ConvBlock(nn.Module):
-    def __init__(self, input_chans, out_chans, convs_per_block=4, last=False):
+    def __init__(self, input_chans, out_chans, convs_per_block=4, k_size=1, last=False):
         super(ConvBlock, self).__init__()
         self.in_c = input_chans
         self.out_c = out_chans
@@ -79,13 +83,14 @@ class ConvBlock(nn.Module):
         inp_chans = [int(i) for i in inp_chans]
         conv_layers_1 = []
         for i in range(1, len(inp_chans)//2):
-            layer = nn.Conv2d(inp_chans[i-1], inp_chans[i], kernel_size=1, stride=1, padding=0)
+            layer = nn.Conv2d(
+                inp_chans[i-1], inp_chans[i], kernel_size=k_size, stride=1, padding=k_size//2)
             conv_layers_1.append(layer)
         self.layers_1 = torch.nn.ModuleList(conv_layers_1)
         conv_layers_2 = []
         for i in range(len(inp_chans)//2, len(inp_chans)):
             layer = nn.Conv2d(inp_chans[i-1], inp_chans[i],
-                                 kernel_size=1, stride=1, padding=0)
+                              kernel_size=k_size, stride=1, padding=k_size//2)
             conv_layers_2.append(layer)
         self.layers_2 = torch.nn.ModuleList(conv_layers_2)
 
@@ -95,14 +100,18 @@ class ConvBlock(nn.Module):
         rbg_resized = rbg_resized.expand(b, 3, h, w)
         return rbg_resized
 
-    def forward(self, x):
+    def forward(self, x, target_sizes=None):
         # if not input_img is None:
         h, w = x.shape[2:]
         # x = torch.cat([inputs, pos_encodings, self.resize_rgb(input_img, b, h, w)])
         for l in self.layers_1:
             x = F.relu(l(x))
         if not self.last:
-            x = F.interpolate(x, size=(h*2, w*2), mode='bilinear', align_corners=False)
+            if not (target_sizes is None):
+                x = F.interpolate(x, size=target_sizes, mode='bilinear', align_corners=False)
+            else:
+                x = F.interpolate(x, size=(h*2, w*2),
+                                  mode='bilinear', align_corners=False)
         for l in self.layers_2[:-1]:
             x = F.relu(l(x))
         x = self.layers_2[-1](x)
@@ -124,8 +133,9 @@ class SOMSINetwork(torch.nn.Module):
 
     def register_pos_encodings(self):
         for l in range(self.configs.num_blocks):
+            pos_enc = get_positional_encoding(l, self.configs)
             self.register_buffer(
-                f'pos_encodings_{l}', get_positional_encoding(l, self.configs))
+                f'pos_encodings_{l}', pos_enc)
 
     def build_conv_blocks(self):
         blocks = []
@@ -134,13 +144,13 @@ class SOMSINetwork(torch.nn.Module):
         for l in range(self.configs.num_blocks):
             if l==self.configs.num_blocks-1:
                 blocks.append(
-                    ConvBlock(in_chans[l], out_chans[l], convs_per_block, last=True))
+                    ConvBlock(in_chans[l], out_chans[l], convs_per_block, k_size=self.configs.k_size, last=True))
             else:
                 blocks.append(
-                    ConvBlock(in_chans[l], out_chans[l], convs_per_block))
+                    ConvBlock(in_chans[l], out_chans[l], convs_per_block, k_size=self.configs.k_size, last=False))
         self.blocks = torch.nn.ModuleList(blocks)
         self.out_block = ConvBlock(
-            self.last_chan_in, self.get_output_size(), convs_per_block, last=True)
+            self.last_chan_in, self.get_output_size(), convs_per_block, k_size=self.configs.k_size, last=True)
 
 
     def get_output_size(self):
@@ -166,6 +176,41 @@ class SOMSINetwork(torch.nn.Module):
         return in_chans, out_chans, last_chan_in
 
     def forward(self, input_rgb):
+        if self.configs.with_pixel_input:
+            return self.forward_with_pix(input_rgb)
+        else:
+            b = input_rgb.shape[0]
+            hw_list = [input_rgb.shape[-2:]]
+            for i in range(1, self.configs.num_blocks):
+                h_i, w_i = hw_list[-1][0]//2, hw_list[-1][1]//2
+                hw_list.append([h_i, w_i])
+            prev_act = None
+            hw_list = list(reversed(hw_list))
+            pos_encodings = []
+            for i in range(len(self.blocks)):
+                pos_encodings.append(getattr(self, f'pos_encodings_{i}'))
+            for i, l in enumerate(self.blocks):
+                h, w = hw_list[i][0], hw_list[i][1]
+                
+                p_size = pos_encodings[i].shape[1]
+                # print(
+                #     f"****** here ********** {pos_encodings_i.shape, [b, p_size, h, w]} ", )
+                pos_encoding = (pos_encodings[i]).expand(b, p_size, h, w)
+                if i == 0:
+                    next_h, next_w = pos_encodings[i+1].shape[-2:]
+                    prev_act = l(pos_encoding, target_sizes=[next_h, next_w])
+                else:
+                    x = torch.cat([prev_act, pos_encoding], dim=1)
+                    if i<(len(self.blocks)-1):
+                        next_h, next_w = pos_encodings[i+1].shape[-2:]
+                        prev_act = l(x, target_sizes=[next_h, next_w])
+                    else:
+                        prev_act = l(x, target_sizes=None)
+            x = self.out_block(
+                torch.cat([prev_act, pos_encoding], dim=1))
+            return self.split_result(x)
+            
+    def forward_with_pix(self, input_rgb):
         rgb_list = [input_rgb]
         for i in range(1,self.configs.num_blocks):
             h_i, w_i = rgb_list[-1].shape[2:]
