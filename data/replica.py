@@ -11,6 +11,7 @@ class ReplicaLoader(Dataset):
     def __init__(self, configs):
         super(ReplicaLoader, self).__init__()
         self.configs = configs
+        self.split = self.configs.mode
         self.baseline = 0.1
         self.poses, self.images, self.ref_img = self._load_replica()
 
@@ -28,7 +29,6 @@ class ReplicaLoader(Dataset):
         return pose_list
 
     def _load_replica(self):
-        self.split = self.configs.mode
         scene_number = self.configs.scene_number
         base_name = os.path.join(
             self.configs.dataset_path, f'replica/scene_{str(scene_number).zfill(2)}')
