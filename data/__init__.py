@@ -2,6 +2,7 @@ __all__ = ['get_dataset']
 from .med_port import MedPortLoader
 from .residential import ResidentialAreaLoader
 from .replica import ReplicaLoader
+from .nex_mpi import loadDataset
 # from .dense_replica_loader import DenseReplicaLoader
 # from .coffe_area_loader import CoffeAreaLoader
 # from .coffee_area_1d import CoffeArea1DLoader
@@ -16,6 +17,8 @@ def get_dataset(configs):
     dataset_map['d3dkit'] = MedPortLoader
     dataset_map['residential'] = ResidentialAreaLoader
     dataset_map['replica'] = ReplicaLoader
+    dataset_map['nex'] = loadDataset
+    
     # dataset_map['coffee_1d'] = CoffeArea1DLoader
     # dataset_map['coffee_2d'] = CoffeArea2DLoader
     # dataset_map['coffee_12v'] = CoffeArea12VLoader
