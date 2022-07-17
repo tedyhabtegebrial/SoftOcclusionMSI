@@ -22,9 +22,11 @@ class BasisFunction(torch.nn.Module):
     
     def forward(self, input_vecs):
         if self.configs.num_basis==1:
-            b = input_vecs.shape[0]
-            c, h, w = self.ones.shape[1:]
-            ones = self.ones.expand(b, c, h, w)
+            # b = input_vecs.shape[0]
+            b, c, h, w = input_vecs.shape
+            # ones = self.ones.expand(b, c, h, w)
+            ones = torch.ones(1, 1, 1, 1).to(
+                input_vecs.device).expand(b, c, h, w)
             return ones
         x = input_vecs
         for i, layer in enumerate(self.layers):
@@ -32,9 +34,8 @@ class BasisFunction(torch.nn.Module):
             if not i==(len(self.layers)-1):
                 x = torch.relu(x)
         x = torch.tanh(x)
-        b = x.shape[0]
-        c, h, w = self.ones.shape[1:]
-        ones = self.ones.expand(b, c, h, w)
+        b, c, h, w = input_vecs.shape
+        ones = torch.ones(1,1,1,1).to(input_vecs.device).expand(b, c, h, w)
         x = torch.cat([x, ones], dim=1)
         return x
 
