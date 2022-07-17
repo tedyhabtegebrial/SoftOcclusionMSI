@@ -3,7 +3,9 @@ import argparse
 # Data related settings
 argparser = argparse.ArgumentParser()
 argparser.add_argument('--slurm', action='store_true', help='pass when using slurm')
-argparser.add_argument('--dataset', default='replica', help='choose dataset from [replica, ricoh]')
+argparser.add_argument('--dataset', default='replica',
+                       help='choose dataset from [replica, residential, med_port, food]')
+
 argparser.add_argument('--dataset_path', default='/netscratch/teddy/spherical_lf_tar_files/', type=str)
 argparser.add_argument('--mode', default='train', type=str)
 argparser.add_argument('--exp_name', default='experiment_v1', type=str)
@@ -70,9 +72,36 @@ argparser.add_argument('--basis_layers', type=int, default=8,
 argparser.add_argument('--num_basis', type=int, default=1,
                     help='number basis functions, if 1, not reflectance coefs will be used')
 
+
+# Perspective Model Training
+# Settings for NexMPI dataset loader
+argparser.add_argument('--perspective_model', action='store_true',
+                        help='A perspective image formation model will be used')
+argparser.add_argument('--dataset_type', type=str, default='shiny')
+argparser.add_argument('--scene_name', type=str, default='food')
+argparser.add_argument('--k_size', type=int, default=1,
+                       help='Kernel size for the model')
+argparser.add_argument('--offset', type=int, default=200,
+                       help='MPI padding in width will be width+2*offset')
+argparser.add_argument('--scale', type=float, default=-1)
+argparser.add_argument('--ref_img', type=str, default='')
+argparser.add_argument('--deepview_width', type=int, default=800)
+
+## Render path
+argparser.add_argument('--nice_llff', action='store_true',)
+argparser.add_argument('--nice_shiny', action='store_true',)
+argparser.add_argument('--dmin', type=int, default=-1,)
+argparser.add_argument('--dmax', type=int, default=-1,)
+argparser.add_argument('--cv2resize', action='store_true',)
+argparser.add_argument('--random_split', action='store_true',)
+argparser.add_argument('--train_ratio', type=int, default=0.875)
+argparser.add_argument('--num_workers', type=int, default=8,)
+
+
 # Pre-trained model
 argparser.add_argument('--ckpt_path', type=str, default='',
                        help='pre-trained ckpt')
+
 
 
 if __name__=='__main__':
