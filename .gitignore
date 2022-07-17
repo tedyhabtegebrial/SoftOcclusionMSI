@@ -2,6 +2,7 @@
 .vscode/
 logs/
 somsi_data/
+nex_data/
 demo.py
 exp_logs/
 scripts_old/
