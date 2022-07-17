@@ -25,6 +25,7 @@ torch==1.7.1
 numpy==1.18.5
 opencv-python==4.5.1
 kornia==0.4.1
+lpips==0.1.3
 ```
 
 ## Datasets
