@@ -3,6 +3,7 @@
 logs/
 somsi_data/
 nex_data/
+thirdparty/nex-code/
 demo.py
 exp_logs/
 scripts_old/
