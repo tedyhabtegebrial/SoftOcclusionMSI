@@ -1,0 +1,24 @@
+python -m train \
+        --ngpus=1 \
+        --nnodes=1 \
+        --perspective_model \
+        --dataset=nex \
+        --dataset_type=shiny \
+        --scene_name=food \
+        --logging_path=/home/habtegebrial/Desktop/Work/Papers/CVPR22/code_release/exp_logs_perspective_model \
+        --dataset_path=nex_data \
+        --exp_name=feats_3 \
+        --num_blocks=6 \
+        --feats_per_layer=3 \
+        --num_basis=1 \
+        --num_layers=2 \
+        --batch_size=1 \
+        --epochs=300 \
+        --decay_step 60 --decay_gamma 0.8 \
+        --learning_rate=0.001 \
+        --near=2.5 --far=1000 \
+        --height=640 \
+        --width=640 \
+        --convs_per_block=4 \
+        --scale=0.025 \
+        # --with_pixel_input \
