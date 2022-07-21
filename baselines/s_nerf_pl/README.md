@@ -2,7 +2,7 @@
 This implementation adapts the NeRF code from [**This Project**](https://kwea123.github.io/nerf_pl/).
 
 ## Datasets + Models
-For data and pre-trained models please visit the [**ReadMe**](README.md). .
+For data and pre-trained models please visit the [**ReadMe**](../../README.md). .
 
 
 ### Training
