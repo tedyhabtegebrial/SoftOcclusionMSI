@@ -13,7 +13,7 @@ from .replica import ReplicaLoader
 
 def get_dataset(configs):
     dataset_map = {}
-    dataset_map['d3dkit'] = MedPortLoader
+    dataset_map['med_port'] = MedPortLoader
     dataset_map['residential'] = ResidentialAreaLoader
     dataset_map['replica'] = ReplicaLoader
     # dataset_map['coffee_1d'] = CoffeArea1DLoader
