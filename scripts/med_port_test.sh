@@ -2,7 +2,7 @@ python -m test \
         --ngpus=1 \
         --nnodes=1 \
         --with_pixel_input \
-        --dataset=d3dkit \
+        --dataset=med_port \
         --logging_path=exp_logs \
         --dataset_path=somsi_data \
         --num_basis=1 \

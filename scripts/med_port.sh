@@ -2,7 +2,7 @@ python -m train \
         --ngpus=1 \
         --nnodes=1 \
         --with_pixel_input \
-        --dataset=d3dkit \
+        --dataset=med_port \
         --logging_path=/home/habtegebrial/Desktop/Work/Papers/CVPR22/code_release/exp_logs \
         --dataset_path=somsi_data \
         --exp_name=feats_24 \
