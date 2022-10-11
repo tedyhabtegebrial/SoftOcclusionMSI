@@ -16,9 +16,8 @@ class Loss(nn.Module):
         self.height = config.height
         self.width = config.width
         self.dataset = config.dataset
-        self.device = config.device
         # self.spt_utils = spt(height=self.height, width=self.width, dataset=self.dataset, device=self.device)
-        self.lpips_vgg = None
+        self.lpips_vgg = lpips.LPIPS(net='vgg')
 
     def _get_spherical_weighting(self, r=1, fix_const=False, const=1, do_sph_wgts=True):
         """
@@ -104,9 +103,7 @@ class Loss(nn.Module):
         loss : torch.Tensor[1]
             Erp L2 loss between 'pred_view' and 'tgt_view'.
         """
-        batch_size, *_ = pred_view.shape
-        sph_wgts = self._get_spherical_weighting(r=1, fix_const=False, const=sph_wgt_const, do_sph_wgts=do_sph_wgts).expand(batch_size, 1, self.height, self.width) if sph_wgts == None else sph_wgts
-        return torch.mean((sph_wgts * (pred_view - tgt_view)) **2)
+        return torch.mean(pred_view - tgt_view)**2
 
     def loss_perceptual(self, pred_view, tgt_view, sph_wgts=None, sph_wgt_const=1, do_sph_wgts=True):
         """
@@ -126,8 +123,5 @@ class Loss(nn.Module):
         loss : torch.Tensor[1]
             Erp LPIPS loss between 'pred_view' and 'tgt_view'.
         """
-        if self.lpips_vgg is None:
-            self.lpips_vgg = lpips.LPIPS(net='vgg').to(self.device)
         # batch_size, *_ = pred_view.shape
-        # sph_wgts = self._get_spherical_weighting(r=1, fix_const=False, const=sph_wgt_const, do_sph_wgts=do_sph_wgts).expand(batch_size, 1, self.height, self.width) if sph_wgts == None else sph_wgts
         return torch.mean(self.lpips_vgg(pred_view, tgt_view, normalize=False))

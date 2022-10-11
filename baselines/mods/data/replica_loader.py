@@ -25,9 +25,9 @@ from scipy.spatial.transform import Slerp
 
 
 
-class DenseReplicaLoader(Dataset):
+class ReplicaLoader(Dataset):
     def __init__(self, configs):
-        super(DenseReplicaLoader, self).__init__()
+        super(ReplicaLoader, self).__init__()
         # scenes_map = {0: 9, 1: 4, 4: 8, 2: 3, 5: 5, 6: 4, 7: 0,
         #             8: 5, 10: 3, 11: 8, 13: 5, 14: 1, 15: 0, 16: 3}
         self.configs = configs
@@ -68,38 +68,18 @@ class DenseReplicaLoader(Dataset):
             [trg_pose, torch.FloatTensor([0, 0, 0, 1]).view(1, 4)], dim=0)
         p_invtrans_2_wld = torch.mm(trg_pose_2_w, p_invtrans_2_trg)
         return p_invtrans_2_wld[:3, :]
-        # r_1 = (p1[:3, :3]).numpy()
-        # r_2 = (p2[:3, :3]).numpy()
-        # key_rots = Rot.from_matrix([r_1, r_2])
-        # key_times = [0, 1]
-        # slerp = Slerp(key_times, key_rots)
-        # t = random.uniform(0, 1)
-        # interp_rots = torch.from_numpy(slerp([t]).as_matrix().reshape(3,3))
-        # t_1, t_2 = (p1[:3, 3]).view(3,1), (p2[:3, 3]).view(3,1)
-        # t_center = t*t_1 + (1-t)*t_2
-        # pose_intrp = torch.cat([interp_rots, t_center], dim=1)
-        # return pose_intrp
+
     def _load_replica(self):
         self.split = self.configs.mode
-        # {room_id:scene_id}
-        scenes_map = {0: 9, 1: 4, 4: 8, 2: 3, 5: 5, 6: 4, 7: 0,
-                      8: 5, 10: 3, 11: 8, 13: 5, 14: 1, 15: 0, 16: 3}
-        room_id = list(scenes_map.keys())[self.configs.scene_number]
-        scene_id = scenes_map[room_id]
-        base_name = os.path.join(self.configs.dataset_path, f'episode_{str(room_id).zfill(5)}', str(scene_id).zfill(5))
+        base_name = os.path.join(
+            self.configs.dataset_path, f'replica/scene_{str(self.configs.scene_number).zfill(2)}')
         files = []
-        # since we skip every other image in the LF
         for h in range(0, 9, 2):
             for w in range(0, 9, 2):
                 fname = os.path.join(
-                    base_name, f'example_{str(scene_id).zfill(10)}.color_{h}_{w}.png')
+                    base_name, f'image_{h}_{w}.png')
                 files.append(fname)
         self.train_indices = [0, 1, 3, 4, 5, 9, 12, 15, 19, 20, 21, 24]
-        # if self.configs.num_inputs == 12:
-        # elif self.configs.num_inputs == 8:
-        #     train_idxs = [0, 4, 5, 9, 12, 15, 20, 24]
-        # elif self.configs.num_inputs == 5:
-        #     train_idxs = [0, 4, 12, 20, 24]
         ref_idx = 12
         self.val_indices = [2, 6, 7, 8, 10, 11, 13, 14, 16, 17, 18, 22]
         self.all_pose = self._get_pose(list(range(25)), ref_idx)
@@ -146,30 +126,3 @@ class DenseReplicaLoader(Dataset):
             images_list.append(img_tens.squeeze())
         images_list = torch.stack(images_list)
         return images_list
-
-if __name__ == '__main__':
-    class Configs:
-        def __init__(self):
-            self.dataset = 'd3dkit'
-    configs = Configs()
-    configs.scene_number = 1
-    configs.height = 256
-    configs.width = 512
-    configs.num_inputs = 12
-    # configs.dataset_path = '/netscratch/teddy/dense3dkit/spherical_light_fields/datasets/'
-    configs.dataset_path = '/data/teddy/Datasets/dense_lf_1024_512/replica/'
-    configs.mode = 'train'
-    loader_train = DenseReplicaLoader(configs)
-    # print('Dataset length: ', len(dataset))
-    # print('Train')
-    # loader_train = DataLoader(dataset, batch_size=1, shuffle=False)
-    # print(loader_train.poses)
-    configs.mode = 'test'
-    # print('Test')
-    loader_test = DenseReplicaLoader(configs)
-    # print(loader_test.poses)
-    # for itr, data in enumerate(loader):
-    #     print(itr, data['index'])
-    # loader = iter(loader)
-    # data = next(loader)
-    # print(data['pose'])
