@@ -8,4 +8,5 @@ pip install lpips
 ```
 cd baselines/mods
 ./scripts/residential.sh
+./scripts/replica.sh
 ```
